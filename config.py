@@ -1,3 +1,23 @@
+from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+TMP_DIR = Path("tmp")
+OUTPUT_DIR = TMP_DIR / "output"
+STATES_DIR = TMP_DIR / "states"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+STATES_DIR.mkdir(parents=True, exist_ok=True)
+
+REDDIT_CREDENTIALS = {
+    "username": os.getenv("REDDIT_USERNAME"),
+    "password": os.getenv("REDDIT_PASSWORD"),
+    "user_agent": os.getenv("REDDIT_USER_AGENT"),
+    "client_id": os.getenv("REDDIT_CLIENT_ID"),
+    "client_secret": os.getenv("REDDIT_CLIENT_SECRET"),
+}
+
 CHROME_ARGS = [
     "--profile-directory=CustomerProfile",
     "--disable-features=SameSiteByDefaultCookies,CookiesWithoutSameSiteMustBeSecure",

@@ -3,16 +3,12 @@ from bs4 import BeautifulSoup
 import re
 import json
 import random
-from pathlib import Path
 import time
-from config import COOKIES, CHROME_ARGS
+from config import COOKIES, CHROME_ARGS, OUTPUT_DIR, STATES_DIR
 from urllib.parse import urljoin
 
-def save_data(keyword, results):
-    output_dir = Path("output")
-    output_dir.mkdir(exist_ok=True)
-    
-    json_path = output_dir / f"{keyword}_tweets.json"
+def save_data(keyword, results): 
+    json_path = OUTPUT_DIR / f"{keyword}_tweets.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False)
 
@@ -58,7 +54,7 @@ def scrape_tweets(keyword, tweet_num):
 
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(
-            "states/twitter_context",
+            user_data_dir=STATES_DIR / "twitter_context",
             headless=False,
             args=CHROME_ARGS,
         )
@@ -96,7 +92,13 @@ def scrape_tweets(keyword, tweet_num):
                     seen_urls.add(tweet_data["url"])
                     results.append(tweet_data)
                     print(f"Collected {len(results)}/{tweet_num}")
+                    
             last_html = current_html
         
     save_data(keyword, results[:tweet_num])
     return results
+
+if __name__ == "__main__":
+    keyword = "slay"
+    tweet_num = 100
+    scrape_tweets(keyword, tweet_num)
