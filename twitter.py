@@ -1,16 +1,10 @@
 from patchright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import re
-import json
 import random
 import time
-from config import COOKIES, CHROME_ARGS, OUTPUT_DIR, STATES_DIR
+from config import COOKIES, CHROME_ARGS, STATES_DIR, save_data
 from urllib.parse import urljoin
-
-def save_data(keyword, results): 
-    json_path = OUTPUT_DIR / f"{keyword}_tweets.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
 
 # check if the tweet contains the keyword in the text
 def should_keep_tweet(tweet_element, keyword):
@@ -73,7 +67,7 @@ def scrape_tweets(keyword, tweet_num):
                     random.randint(8000, 12000) + 
                     random.gauss(500, 200)
                 )
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(0.9, 1.2))
 
             current_html = page.content()
             if current_html == last_html:
@@ -95,10 +89,10 @@ def scrape_tweets(keyword, tweet_num):
                     
             last_html = current_html
         
-    save_data(keyword, results[:tweet_num])
+    save_data(keyword, results[:tweet_num], "twitter")
     return results
 
 if __name__ == "__main__":
-    keyword = "slay"
+    keyword = "lit"
     tweet_num = 100
     scrape_tweets(keyword, tweet_num)

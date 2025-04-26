@@ -1,12 +1,6 @@
 import praw
-import json
 import time
-from config import REDDIT_CREDENTIALS, OUTPUT_DIR
-
-def save_reddit_data(keyword, results):
-    json_path = OUTPUT_DIR / f"{keyword}_reddit.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
+from config import REDDIT_CREDENTIALS, save_data
 
 def process_submission(submission, search_term, time_filter):
     return {
@@ -52,7 +46,7 @@ def reddit_search(keyword, limit=100):
                     query=search_term,
                     time_filter=time_filter,
                     limit=100,
-                    sort="relevance"
+                    sort="relevance",
                 )
                 current_seen_ids = len(seen_ids)
                 for submission in submissions:
@@ -74,11 +68,11 @@ def reddit_search(keyword, limit=100):
     return results[:limit]
 
 if __name__ == "__main__":
-    keyword = "slay"
-    limit = 1000
+    keyword = "simp"
+    limit = 200
     
     posts = reddit_search(keyword, limit)
-    save_reddit_data(keyword, posts)
+    save_data(keyword, posts, "reddit")
     
     print(f"\n{'='*50}")
     print(f"Reddit Research Report for: '{keyword}'")

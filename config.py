@@ -1,6 +1,8 @@
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from datetime import datetime
+import json
 
 load_dotenv()
 
@@ -68,3 +70,10 @@ COOKIES = [
       "sameSite": "None"
     },
   ]
+
+def save_data(keyword, results, scraper_name):
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    json_path = OUTPUT_DIR / f"{keyword}_{timestamp}_{scraper_name}.json"
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
