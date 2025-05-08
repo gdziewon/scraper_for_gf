@@ -1,9 +1,11 @@
 import praw
 import time
 from config import REDDIT_CREDENTIALS
+import uuid
 
 def process_submission(submission, keyword):
     return {
+            "uuid": str(uuid.uuid4()),
             "id": submission.id,
             "text": f"{submission.title}\n{submission.selftext}".strip(),
             "url": submission.url,

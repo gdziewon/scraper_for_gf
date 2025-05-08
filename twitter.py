@@ -5,6 +5,7 @@ import random
 import time
 from config import COOKIES, CHROME_ARGS, STATES_DIR
 from urllib.parse import urljoin
+import uuid
 
 # check if the tweet contains the keyword in the text
 def should_keep_tweet(tweet_element, keyword):
@@ -33,6 +34,7 @@ def extract_tweet_data(article):
                 .text.strip('@') if article.find("div", {"data-testid": "User-Name"}) else None
 
     return {
+        "uuid": str(uuid.uuid4()),
         "id": tweet_id,
         "text": text,
         "url": url,

@@ -51,6 +51,7 @@ if __name__ == "__main__":
     raw = session_dir / "raw"
     raw.mkdir(parents=True, exist_ok=True)
 
+    print(f"Started session: {session_dir.name}")
     for keyword in keywords.keys():
         print(f"Scraping Twitter for keyword: {keyword}")
         tweets = scrape_tweets(keyword, amount)
