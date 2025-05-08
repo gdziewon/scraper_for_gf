@@ -1,8 +1,6 @@
 from pathlib import Path
 from dotenv import load_dotenv
 import os
-from datetime import datetime
-import json
 
 load_dotenv()
 
@@ -19,6 +17,17 @@ REDDIT_CREDENTIALS = {
     "client_id": os.getenv("REDDIT_CLIENT_ID"),
     "client_secret": os.getenv("REDDIT_CLIENT_SECRET"),
 }
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+PROMPT_TEMPLATE = """Classify usage of "{keyword}" in this text as:
+- 'old' for meaning: "{old}"
+- 'new' for meaning: "{new}"
+- 'unknown' if unclear
+
+Text: {text}
+
+Respond with ONLY one word:"""
 
 CHROME_ARGS = [
     "--profile-directory=CustomerProfile",
@@ -70,10 +79,3 @@ COOKIES = [
       "sameSite": "None"
     },
   ]
-
-def save_data(keyword, results, scraper_name):
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-    json_path = OUTPUT_DIR / f"{keyword}_{timestamp}_{scraper_name}.json"
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)

@@ -1,18 +1,15 @@
 import praw
 import time
-from config import REDDIT_CREDENTIALS, save_data
+from config import REDDIT_CREDENTIALS
 
-def process_submission(submission, search_term, time_filter):
+def process_submission(submission, keyword):
     return {
             "id": submission.id,
-            "title": submission.title,
-            "author": str(submission.author) if submission.author else "[deleted]",
-            "score": submission.score,
+            "text": f"{submission.title}\n{submission.selftext}".strip(),
             "url": submission.url,
-            "created_utc": submission.created_utc,
-            "body": submission.selftext,
-            "time_filter": time_filter,
-            "search_term": search_term,
+            "created_at": submission.created_utc,
+            
+            "username": submission.author.name if submission.author else "[deleted]",
             "subreddit": submission.subreddit.display_name,
         }
 
@@ -53,8 +50,11 @@ def reddit_search(keyword, limit=100):
                     if submission.id in seen_ids:
                         continue
                     
-                    result = process_submission(submission, search_term, time_filter)
+                    result = process_submission(submission, keyword)
                     seen_ids.add(submission.id)
+                    if len(result["text"]) > 500:
+                        continue
+                    
                     results.append(result)
 
                     print(f"Collected {len(results)}/{limit}")
@@ -72,7 +72,6 @@ if __name__ == "__main__":
     limit = 200
     
     posts = reddit_search(keyword, limit)
-    save_data(keyword, posts, "reddit")
     
     print(f"\n{'='*50}")
     print(f"Reddit Research Report for: '{keyword}'")

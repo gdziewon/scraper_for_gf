@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import random
 import time
-from config import COOKIES, CHROME_ARGS, STATES_DIR, save_data
+from config import COOKIES, CHROME_ARGS, STATES_DIR
 from urllib.parse import urljoin
 
 # check if the tweet contains the keyword in the text
@@ -16,32 +16,29 @@ def should_keep_tweet(tweet_element, keyword):
     return re.search(rf'\b{re.escape(keyword)}\b', tweet_text, re.IGNORECASE)
 
 def extract_tweet_data(article):
-    tweet_data = {
-        "url": None,
-        "username": None,
-        "text": None,
-        "date": None
-    }
-
     link = article.find("a", {"href": re.compile(r'/status/')})
-    if link:
-        tweet_data["url"] = urljoin("https://x.com", link["href"])
-
-    user_section = article.find("div", {"data-testid": "User-Name"})
-    if user_section:
-        username_link = user_section.find("a", href=re.compile(r'^/'))
-        if username_link:
-            tweet_data["username"] = username_link.text.strip('@')
-
-    text_div = article.find("div", {"data-testid": "tweetText"})
-    if text_div:
-        tweet_data["text"] = ' '.join([span.text for span in text_div.find_all("span")])
-
+    tweet_id = link["href"].split('/')[-1] if link else None
+    url = urljoin("https://x.com", link["href"]) if link else None
+    
     time_tag = article.find("time")
-    if time_tag and "datetime" in time_tag.attrs:
-        tweet_data["date"] = time_tag["datetime"]
+    created_at = time_tag["datetime"] if (time_tag and "datetime" in time_tag.attrs) else None
 
-    return tweet_data
+    text = ' '.join([
+            span.text 
+            for span in article.find("div", {"data-testid": "tweetText"})
+        ]) if article.find("div", {"data-testid": "tweetText"}) else ""
+    
+    username = (article.find("div", {"data-testid": "User-Name"})) \
+                .find("a", href=re.compile(r'^/')) \
+                .text.strip('@') if article.find("div", {"data-testid": "User-Name"}) else None
+
+    return {
+        "id": tweet_id,
+        "text": text,
+        "url": url,
+        "created_at": created_at,
+        "username": username,
+    }
 
 def scrape_tweets(keyword, tweet_num):
     link = f"https://x.com/search?q={keyword}&f=live&src=typed_query"
@@ -81,7 +78,7 @@ def scrape_tweets(keyword, tweet_num):
                     continue
                     
                 tweet_data = extract_tweet_data(article)
-                
+
                 if tweet_data["url"] and tweet_data["url"] not in seen_urls:
                     seen_urls.add(tweet_data["url"])
                     results.append(tweet_data)
@@ -89,10 +86,11 @@ def scrape_tweets(keyword, tweet_num):
                     
             last_html = current_html
         
-    save_data(keyword, results[:tweet_num], "twitter")
-    return results
+    return results[:tweet_num]
 
 if __name__ == "__main__":
-    keyword = "lit"
-    tweet_num = 100
-    scrape_tweets(keyword, tweet_num)
+    keyword = "slay"
+    tweet_num = 5
+    tweets = scrape_tweets(keyword, tweet_num)
+    for tweet in tweets:
+        print(tweet)
