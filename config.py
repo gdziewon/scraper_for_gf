@@ -4,11 +4,10 @@ import os
 
 load_dotenv()
 
-TMP_DIR = Path("tmp")
-OUTPUT_DIR = TMP_DIR / "output"
-STATES_DIR = TMP_DIR / "states"
+OUTPUT_DIR = Path("output")
+TWITTER_SESSION = Path("twitter_session")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-STATES_DIR.mkdir(parents=True, exist_ok=True)
+TWITTER_SESSION.mkdir(parents=True, exist_ok=True)
 
 REDDIT_CREDENTIALS = {
     "username": os.getenv("REDDIT_USERNAME"),

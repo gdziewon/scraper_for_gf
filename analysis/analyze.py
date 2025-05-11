@@ -11,7 +11,7 @@ def analyze_batch(session_dir: Path, batch_id: str):
     processed_dir = session_dir / "processed"
     processed_dir.mkdir(exist_ok=True)
     
-    # Download results
+    # download
     batch = client.batches.retrieve(batch_id)
     results_content = client.files.content(batch.output_file_id).text
     results = [json.loads(line) for line in results_content.splitlines()]

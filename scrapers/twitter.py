@@ -3,18 +3,22 @@ from bs4 import BeautifulSoup
 import re
 import random
 import time
-from config import COOKIES, CHROME_ARGS, STATES_DIR
+from config import COOKIES, CHROME_ARGS, TWITTER_SESSION
 from urllib.parse import urljoin
 import uuid
+from utils import is_valid_text, is_english, contains_keyword
 
-# check if the tweet contains the keyword in the text
 def should_keep_tweet(tweet_element, keyword):
     text_div = tweet_element.find("div", {"data-testid": "tweetText"})
     if not text_div:
         return False
         
     tweet_text = ' '.join([span.text for span in text_div.find_all("span")])
-    return re.search(rf'\b{re.escape(keyword)}\b', tweet_text, re.IGNORECASE)
+    return (
+        contains_keyword(tweet_text, keyword) and
+        is_valid_text(tweet_text) and
+        is_english(tweet_text)
+    )
 
 def extract_tweet_data(article):
     link = article.find("a", {"href": re.compile(r'/status/')})
@@ -47,7 +51,7 @@ def scrape_tweets(keyword, tweet_num):
 
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(
-            user_data_dir=STATES_DIR / "twitter_context",
+            user_data_dir=TWITTER_SESSION,
             headless=False,
             args=CHROME_ARGS,
         )

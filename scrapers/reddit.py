@@ -1,22 +1,33 @@
-import praw
+from praw import Reddit
+from praw.models import Submission
 import time
 from config import REDDIT_CREDENTIALS
 import uuid
+from utils import is_valid_text, is_english
 
-def process_submission(submission, keyword):
+def is_too_long(text: str, max_length: int = 500) -> bool:
+    return len(text) > max_length
+
+def should_keep_submission(text: str):
+    return (
+        not is_too_long(text) and
+        is_valid_text(text) and
+        is_english(text)
+    )
+
+def process_submission(submission: Submission):
     return {
             "uuid": str(uuid.uuid4()),
             "id": submission.id,
             "text": f"{submission.title}\n{submission.selftext}".strip(),
             "url": submission.url,
             "created_at": submission.created_utc,
-            
             "username": submission.author.name if submission.author else "[deleted]",
             "subreddit": submission.subreddit.display_name,
         }
 
 def reddit_search(keyword, limit=100):
-    reddit = praw.Reddit(
+    reddit = Reddit(
         client_id=REDDIT_CREDENTIALS["client_id"],
         client_secret=REDDIT_CREDENTIALS["client_secret"],
         user_agent=REDDIT_CREDENTIALS["user_agent"],
@@ -34,7 +45,7 @@ def reddit_search(keyword, limit=100):
         keyword
     ]
 
-    sort_options = ["relevance", "hot", "new", "top", "comments"]
+    # sort_options = ["relevance", "hot", "new", "top", "comments"] might be needed in some time
     time_filters = ["all", "year", "month", "week", "day"]
 
     for time_filter in time_filters:
@@ -52,9 +63,9 @@ def reddit_search(keyword, limit=100):
                     if submission.id in seen_ids:
                         continue
                     
-                    result = process_submission(submission, keyword)
+                    result = process_submission(submission)
                     seen_ids.add(submission.id)
-                    if len(result["text"]) > 500:
+                    if not should_keep_submission(result["text"]):
                         continue
                     
                     results.append(result)

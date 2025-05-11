@@ -1,9 +1,9 @@
-from twitter import scrape_tweets
-from reddit import reddit_search
+from scrapers.twitter import scrape_tweets
+from scrapers.reddit import reddit_search
 from config import OUTPUT_DIR
 import json
 from datetime import datetime
-from classify import process_session
+from analysis.classify import process_session
 
 def save_data(keyword, results, scraper_name, directory):    
     json_path = directory / f"{keyword}_{scraper_name}.json"
