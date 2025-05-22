@@ -4,10 +4,42 @@ import os
 
 load_dotenv()
 
+AMOUNT = 700
+KEYWORDS = {
+        "slay": {
+            "old": "To kill violently",
+            "new": "To have a strong favorable effect; to be remarkably impressive",
+        },
+        "lit": {
+            "old": "Past tense of light",
+            "new": "Exciting/awesome, general term of approval",
+        },
+        "sigma": {
+            "old": "Greek letter",
+            "new": "Something extremely good/a coolly independent, successful person",
+        },
+        "karen": {
+            "old": "Female name",
+            "new": "Someone obnoxious, angry, and entitled",
+        },
+        "troll": {
+            "old": "Mythical creature",
+            "new": "Internet user who provokes others online",
+        },
+        "influencer": {
+            "old": "Anyone who exerts influence",
+            "new": "A person who generates interest in something by posting about it on social media",
+        }
+    }
+
 OUTPUT_DIR = Path("output")
 TWITTER_SESSION = Path("twitter_session")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 TWITTER_SESSION.mkdir(parents=True, exist_ok=True)
+
+CHECKPOINT_DIR = OUTPUT_DIR / "checkpoints"
+CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
+CHECKPOINT_INTERVAL = 100
 
 REDDIT_CREDENTIALS = {
     "username": os.getenv("REDDIT_USERNAME"),
